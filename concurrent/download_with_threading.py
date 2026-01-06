@@ -1,0 +1,33 @@
+import requests
+import os
+import threading
+
+file_urls = [f"https://dummyimage.com/{i}.png" for i in range(300, 400)]
+
+
+def download_file(file_url, cookies, headers):
+    file_name = os.path.basename(file_url)
+    file_path = os.path.join("downloads", file_name)
+    print(f"Downloading {file_name} ... ")
+
+    response = requests.get(file_url, cookies=cookies, headers=headers)
+    with open(file_path,"wb") as f:
+        f.write(response.content)
+    print(f"{file_name} download successfully")
+
+
+if not os.path.exists("downloads"):
+    os.makedirs("downloads")
+
+threads = []
+
+for file_url in file_urls:
+    t = threading.Thread(target=download_file, args=(file_url, {}, {}))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+
+
+print("all files downloaded successfully")
